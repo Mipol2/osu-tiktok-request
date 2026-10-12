@@ -25,22 +25,47 @@ class Comment:
         return self.nickname.strip() or self.user_id
 
 
+CHAT_EVENTS = {"chat", "comment", "message"}
+TEXT_KEYS = ("comment", "content", "message", "text", "msg")
+ID_KEYS = ("uniqueId", "unique_id", "username", "userId", "user_id")
+NAME_KEYS = ("nickname", "nickName", "displayName", "display_name")
+
+
+def _loads(value):
+    if isinstance(value, (str, bytes)):
+        try:
+            return json.loads(value)
+        except ValueError:
+            return None
+    return value
+
+
+def _first(sources: list[dict], keys: tuple[str, ...]) -> str:
+    for source in sources:
+        for key in keys:
+            value = source.get(key)
+            if isinstance(value, (str, int)) and str(value).strip():
+                return str(value).strip()
+    return ""
+
+
 def parse_event(raw: str | bytes) -> Comment | None:
-    try:
-        message = json.loads(raw)
-    except (TypeError, ValueError):
+    message = _loads(raw)
+    if not isinstance(message, dict):
         return None
-    if not isinstance(message, dict) or message.get("event") != "chat":
+    event = str(message.get("event") or message.get("type") or "").lower()
+    if event not in CHAT_EVENTS:
         return None
-    data = message.get("data")
+    data = _loads(message.get("data"))
     if not isinstance(data, dict):
         return None
-    user = data.get("user") if isinstance(data.get("user"), dict) else {}
-    user_id = str(data.get("uniqueId") or user.get("uniqueId") or "").strip()
-    nickname = str(data.get("nickname") or user.get("nickname") or "")
-    text = str(data.get("comment") or "")
-    if not user_id or not text:
+    user = _loads(data.get("user"))
+    sources = [data, user] if isinstance(user, dict) else [data]
+    text = _first([data], TEXT_KEYS)
+    if not text:
         return None
+    nickname = _first(sources, NAME_KEYS)
+    user_id = _first(sources, ID_KEYS) or nickname or "unknown"
     return Comment(user_id, nickname, text)
 
 
@@ -52,9 +77,12 @@ async def comments(url: str) -> AsyncIterator[Comment]:
                 log.info("Connected to IndoFinity at %s", url)
                 warned = False
                 async for raw in ws:
+                    log.debug("IndoFinity event: %s", raw[:600] if isinstance(raw, str) else raw[:600])
                     comment = parse_event(raw)
-                    if comment is not None:
-                        yield comment
+                    if comment is None:
+                        continue
+                    log.debug("Chat from %s (%s): %r", comment.display_name, comment.user_id, comment.text)
+                    yield comment
             log.warning("IndoFinity closed the connection, reconnecting")
         except (OSError, WebSocketException, asyncio.TimeoutError) as e:
             if not warned:

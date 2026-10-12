@@ -88,6 +88,8 @@ class RequestBot:
     async def handle(self, comment: Comment) -> Outcome:
         request = parse(comment.text, self.config.commands)
         if request is None:
+            if any(comment.text.lower().startswith(c.lower()) for c in self.config.commands):
+                log.info("Ignored %r from %s: no valid beatmap ID", comment.text, comment.display_name)
             return Outcome.IGNORED
 
         viewer = comment.display_name

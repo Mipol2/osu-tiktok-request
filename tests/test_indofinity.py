@@ -27,6 +27,18 @@ def test_ignores_other_events_and_garbage():
     assert parse_event(json.dumps({"event": "chat", "data": "x"})) is None
 
 
+def test_parse_alternative_shapes():
+    assert parse_event(json.dumps({"event": "comment", "data": {"uniqueId": "u", "comment": "!r 1"}})) == Comment("u", "", "!r 1")
+    assert parse_event(json.dumps({"type": "chat", "data": {"username": "u", "content": "!r 1"}})) == Comment("u", "", "!r 1")
+    nested = json.dumps({"event": "chat", "data": json.dumps({"comment": "!r 1", "user": {"uniqueId": "u", "nickname": "N"}})})
+    assert parse_event(nested) == Comment("u", "N", "!r 1")
+
+
+def test_missing_user_id_still_parses():
+    assert parse_event(chat(nickname="Nick", comment="!r 1")) == Comment("Nick", "Nick", "!r 1")
+    assert parse_event(chat(comment="!r 1")) == Comment("unknown", "", "!r 1")
+
+
 def test_display_name_falls_back_to_user_id():
     assert Comment("u1", " ", "x").display_name == "u1"
 

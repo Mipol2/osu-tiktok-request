@@ -57,6 +57,12 @@ def test_duplicate_mods_are_merged():
     assert parse("!r 123 hd +HD dt", COMMANDS) == Request(123, ("HD", "DT"))
 
 
+def test_lookalike_and_invisible_characters():
+    assert parse("！ｒ　５５６１６１７", COMMANDS) == Request(5561617)
+    assert parse("!r​ 5561617​", COMMANDS) == Request(5561617)
+    assert parse("﻿!r 5561617", COMMANDS) == Request(5561617)
+
+
 def test_note_is_truncated():
     request = parse("!r 123 " + "word " * 50, COMMANDS)
     assert len(request.note) <= 80

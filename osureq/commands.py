@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 from typing import Iterable
 
@@ -8,6 +9,7 @@ MODS = frozenset({"NF", "EZ", "TD", "HD", "HR", "SD", "PF", "DT", "NC", "HT", "D
 MAX_NOTE = 80
 
 _ID = re.compile(r"[0-9]{1,10}")
+_INVISIBLE = re.compile(r"[​-‏⁠-⁤﻿]")
 _LINK = re.compile(
     r"(?:https?://)?osu\.ppy\.sh/(?:b|beatmaps)/([0-9]{1,10})"
     r"|(?:https?://)?osu\.ppy\.sh/beatmapsets/[0-9]+#[a-z]+/([0-9]{1,10})",
@@ -40,8 +42,12 @@ def parse_mods(token: str) -> tuple[str, ...] | None:
     return chunks if all(c in MODS for c in chunks) else None
 
 
+def normalize(text: str) -> str:
+    return _INVISIBLE.sub("", unicodedata.normalize("NFKC", text))
+
+
 def parse(comment: str, commands: Iterable[str]) -> Request | None:
-    parts = comment.split()
+    parts = normalize(comment).split()
     if len(parts) < 2 or parts[0].lower() not in {c.lower() for c in commands}:
         return None
     beatmap_id = parse_beatmap_id(parts[1])

@@ -17,11 +17,8 @@ log = logging.getLogger("osureq")
 
 
 def setup_logging(verbose: bool) -> None:
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format="%(asctime)s  %(message)s",
-        datefmt="%H:%M:%S",
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s  %(message)s", datefmt="%H:%M:%S")
+    logging.getLogger("osureq").setLevel(logging.DEBUG if verbose else logging.INFO)
     for noisy in ("httpx", "httpcore", "websockets"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
