@@ -1,0 +1,27 @@
+{
+  "osu_username": "Your osu name",
+  "irc_password": "your IRC password",
+  "api_client_id": "12345",
+  "api_client_secret": "your client secret",
+  "indofinity_url": "ws://localhost:62024",
+  "commands": [
+    "!r",
+    "!req",
+    "!request"
+  ],
+  "user_cooldown": 30,
+  "allow_duplicates": false,
+  "send_interval": 1.5,
+  "announce_start": true,
+  "blocked_users": [],
+  "log_file": "requests.log",
+  "filters": {
+    "min_stars": null,
+    "max_stars": 7.0,
+    "max_length": 300,
+    "modes": [
+      "osu"
+    ],
+    "statuses": []
+  }
+}
