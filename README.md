@@ -19,22 +19,26 @@ IndoFinity desktop app ── ws://localhost:62024 ──▶ osu-tiktok-request
 
 ## Contents
 
-- [What you need](#what-you-need)
-- [Setup for streamers](#setup-for-streamers)
-- [Usage for viewers](#usage-for-viewers)
-- [Configuration](#configuration)
-- [Testing without going live](#testing-without-going-live)
-- [Troubleshooting](#troubleshooting)
-- [Running from source](#running-from-source)
-- [Building the .exe](#building-the-exe)
-- [Project layout](#project-layout)
+- [osu! TikTok Request](#osu-tiktok-request)
+  - [Contents](#contents)
+  - [What you need](#what-you-need)
+  - [Setup for streamers](#setup-for-streamers)
+  - [Usage for viewers](#usage-for-viewers)
+  - [Configuration](#configuration)
+  - [Testing without going live](#testing-without-going-live)
+  - [Troubleshooting](#troubleshooting)
+  - [Running from source](#running-from-source)
+  - [Building the .exe](#building-the-exe)
+  - [Project layout](#project-layout)
+  - [Credits](#credits)
+  - [License](#license)
 
 ## What you need
 
 - Windows PC with the **IndoFinity desktop app**. The browser dashboard does not provide the local websocket.
 - An **osu! account** and your **IRC password** from [your account settings](https://osu.ppy.sh/home/account/edit) under *Legacy API → IRC*. This is not your normal login password.
 - Optional but recommended: an **osu! OAuth application** (Client ID and Secret) from the same page under *OAuth*. Without it requests still work, but they arrive as plain links and the filters are off.
-- osu! **stable**. Lazer has not been tested.
+- osu! **stable**.
 
 ## Setup for streamers
 
